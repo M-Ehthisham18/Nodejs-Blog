@@ -375,3 +375,12 @@ img {
 .pagination:hover {
   color: var(--black);
 }
+
+.login-btn{
+  padding: 5px 16px;
+  font-weight: 700;
+  font-size: x-large;
+  border: 1px solid black;
+  border-radius: 4px;
+  background: #84f5a1;
+}
