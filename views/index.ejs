@@ -1,0 +1,52 @@
+<style>
+  .pagination-button{
+    display: flex;
+    justify-content: space-between;
+    
+  }
+</style>
+<div class="author">
+  <h1 class="author__heading">Hi, I am Ehthisham.</h1>
+  <p class="author__body">Web developer and content creator.</p>
+</div>
+
+<img src="/img/user_cover_imgage.webp" alt="person looking out through window" class="hero-image" width="981" height="528">
+
+<section class="articles">
+  <h2 class="articles__heading">Latest Posts</h2>
+
+  <ul class="article-ul">
+    
+    <% data.forEach(post => { %>
+
+      <% if (post.title && post.title.trim() !== "") { %>
+        
+        <li>
+          <a href="/post/<%= post._id  %>">
+            <span>
+              <%= post.title %>
+            </span>
+            <span class="article-list__date">
+              <%= post.createdAt.toDateString() %>
+            </span>
+          </a>
+        </li>
+        <% } %>
+        <% }) %>
+      
+  </ul>
+  
+  <div class="pagination-button">
+    <div>
+      <% if (previousPage !== null) { %>
+        <a href="/?page=<%= previousPage %>" class="pagination">&lt; Previous</a>
+      <% } %>
+    </div>
+    <div>
+      <% if (nextPage !== null) { %>
+        <a href="/?page=<%= nextPage %>" class="pagination">Next &gt;</a>
+      <% } %>
+    </div>
+  </div>
+
+</section>

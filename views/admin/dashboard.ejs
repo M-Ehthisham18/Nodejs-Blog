@@ -1,0 +1,48 @@
+<div style="display: flex; align-items: center; gap: 8px; font-size: x-large; text-transform: capitalize; padding: 32px 4px" >
+  admin : <h2 style="font-weight: 600;"><%= locals.adminName %></h2>
+</div>
+<section>
+  <div class="admin-title">
+    <h2>Posts</h2>
+    <a href="/admin/add-post" class="button">+ Add New</a>
+  </div>
+
+  <ul class="admin-posts">
+    <% data.forEach(post => { %> <% if (post.body.trim() && post.title.trim()
+    !== "") { %>
+    <li>
+      <a href="/admin/post/<%= post._id %>"> <%= post.title %> &nearr; </a>
+      <div class="admin-post-controls">
+        <a href="/admin/edit-post/<%= post._id %>" class="btn">Edit</a>
+
+        <form
+          action="/admin/delete-post/<%= post._id %>?_method=DELETE"
+          method="POST"
+        >
+          <input type="submit" value="Delete" class="btn-delete btn" />
+
+          <!-- <button type="submit" value="Delete" class="btn">
+              <i class="fa-solid fa-trash-can" style="color: #ff0000;"></i>
+            </button> -->
+        </form>
+      </div>
+    </li>
+    <% } %> <% }) %>
+  </ul>
+
+  <div class="pagination-button" style="display: flex; justify-content: space-between;">
+    <div>
+      <% if (previousPage !== null) { %>
+      <a href="/admin/dashboard/?page=<%= previousPage %>" class="pagination"
+        >&lt; Previous</a
+      >
+      <% } %>
+    </div>
+    
+    <div>
+      <% if (nextPage !== null) { %>
+        <a href="/admin/dashboard/?page=<%= nextPage %>" class="pagination">Next &gt;</a>
+      <% } %>
+    </div>
+  </div>
+</section>

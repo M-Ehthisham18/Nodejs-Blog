@@ -1,0 +1,25 @@
+<header class="header">
+  <a href="/admin" class="header__logo">Admin-Panel</a>
+
+  <nav class="header__nav">
+    <ul>
+      <li>
+        <a href="/">Home</a>
+      </li>
+      <li>
+        <a href="/about">About</a>
+      </li>
+      <li>
+        <a href="/contact">Contact</a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="header__button">
+    <button>
+      <a href="/admin/logout" style="text-decoration: none; font-weight: 600">
+        <%= locals.signIn || "Logout" %>
+      </a>
+    </button>
+  </div>
+</header>
