@@ -1,16 +1,13 @@
-<a href="/admin/dashboard">&larr; Back</a>
-<div class="admin-title">
-  <h2>Add New Post</h2>
-</div>
-
-<form action="/admin/add-post" method="POST">
-
+<form action="/admin/add-post" method="POST" enctype="multipart/form-data">
   <label for="title"><b>Title</b></label>
-  <input type="text" placeholder="Post Title" name="title" autofocus required>
+  <input type="text" id="title" placeholder="Post Title" name="title" autofocus required maxlength="150">
 
   <label for="body"><b>Content</b></label>
-  <textarea name="body" cols="50" rows="10" required></textarea>
+  <textarea id="body" name="body" cols="50" rows="10" required></textarea>
+
+  <label for="media"><b>Media (Images/Videos)</b></label>
+  <input type="file" id="media" name="media" accept="image/jpeg, image/png, image/webp, video/mp4, video/avi" multiple>
+  <br><br>
 
   <input type="submit" value="Add" class="btn">
-
 </form>

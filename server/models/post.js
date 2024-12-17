@@ -11,6 +11,10 @@ const postSchema = new Schema({
     type : String,
     require : true,
   },
+  media: {
+    type: [String], // Array of Cloudinary URLs
+    default: [],
+  },
   createdAt : {
     type : Date,
 default: Date.now

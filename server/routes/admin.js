@@ -4,11 +4,46 @@ const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Post = require("../models/post");
-const { render } = require("ejs");
-const user = require("../models/user");
+const multer = require('multer');
+const path = require("path");
+const fs = require('fs')
+
+const { uploadOnCloudinary , deleteFromCloudinary } = require('../utils/cloudinay')
+// const upload = require('../utils/multer')
 
 const adminLayout = "../views/layouts/admin";
 const jwtSecret = process.env.JWT_SECRET;
+
+
+// updating field in model
+// async function addMediaFieldToExistingPosts() {
+//   try {
+//     // Add the media field to all existing posts
+//     const result = await Post.updateMany(
+//       { media: { $exists: false } }, // Check if the 'media' field doesn't exist
+//       { $set: { media: [] } } // Set the 'media' field as an empty array
+//     );
+//     console.log("Updated documents:", result);
+//   } catch (error) {
+//     console.error("Error updating documents:", error);
+//   }
+// }
+
+// addMediaFieldToExistingPosts(); 
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+        cb(null, path.join(__dirname, "../../public/img"))
+      },
+  filename: function (req, file, cb) {
+    
+        cb(null, file.originalname);
+    //     // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    //     // cb(null, file.fieldname + '-' + uniqueSuffix)
+      }
+});
+
+const upload = multer({ storage });
 
 /**
  * middleware
@@ -87,7 +122,7 @@ router.post("/register", async (req, res) => {
       res.status(500).json({ message: "Internal server error" });
     }
   } catch (error) {
-    console.log(error);
+    console.log('something went worng whiel registering. ',error);
   }
 });
 
@@ -116,7 +151,6 @@ router.get("/", isLoggedIn,async (req, res) => {
  */
 router.post("/", async (req, res) => {
   try {
-    // console.log(req.body);
 
     const { username, password } = req.body;
 
@@ -184,7 +218,7 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
       layout: adminLayout,
     });
   } catch (error) {
-    console.log(error);
+    console.log('error in dashboard : ',error);
   }
 });
 
@@ -227,7 +261,7 @@ router.get("/add-post", authMiddleware, async (req, res) => {
       layout: adminLayout,
     });
   } catch (error) {
-    console.log(error);
+    console.log('(get) error in add post : ',error);
   }
 });
 
@@ -235,21 +269,43 @@ router.get("/add-post", authMiddleware, async (req, res) => {
  * POST /
  * ADD POST
  */
-router.post("/add-post", authMiddleware, async (req, res) => {
-  try {
-    const newPost = new Post({
-      title: req.body.title,
-      body: req.body.body,
-    });
+router.post(
+  "/add-post",
+  authMiddleware,
+  upload.array("media", 10), // Accept up to 10 files
+  async (req, res) => {
+    try {
+      const { title, body } = req.body;
+      const mediaUrls = [];
 
-    await Post.create(newPost);
-    res.redirect("dashboard");
-  } catch (error) {
-    console.log(error);
+      // Access files from req.files
+      if (req.files && req.files.length > 0) {
+        for (const file of req.files) {
+          // Upload each file to Cloudinary
+          const result = await uploadOnCloudinary(file.path);
+          if (result) {
+            mediaUrls.push(result.secure_url); // Save Cloudinary URL
+          } else {
+            console.log("Error uploading file to Cloudinary");
+          }
+        }
+      }
+
+      // Create a new post with the uploaded media URLs
+      const newPost = new Post({
+        title,
+        body,
+        media: mediaUrls, // Store media URLs in the database
+      });
+      
+      await newPost.save(); // Save the post in the database
+      res.redirect("dashboard");
+    } catch (error) {
+      console.log("Error creating post:", error);
+      res.status(500).send("An error occurred while creating the post.");
+    }
   }
-
-  // res.render("admin/add-post");
-});
+);
 
 /*
  * GET /
@@ -266,7 +322,7 @@ router.get("/edit-post/:id", authMiddleware, async (req, res) => {
 
     res.render("admin/edit-post", { data, locals, layout: adminLayout });
   } catch (error) {
-    console.log(error);
+    console.log('error in edit post (get) : ',error);
   }
 });
 
@@ -284,7 +340,7 @@ router.put("/edit-post/:id", authMiddleware, async (req, res) => {
     res.redirect("/admin/dashboard");
     // res.redirect(`edit-post/${req.params.id}`);
   } catch (error) {
-    console.log(error);
+    console.log('error in edit-post (put) : ',error);
   }
 });
 
@@ -312,10 +368,33 @@ router.get("/delete-all-post", authMiddleware, async (req, res) => {
 
 router.delete("/delete-post/:id", authMiddleware, async (req, res) => {
   try {
+    // Retrieve the post to access media URLs
+    const post = await Post.findById(req.params.id);
+
+    if (!post) {
+      return res.status(404).send("Post not found");
+    }
+
+    // Extract public IDs from Cloudinary URLs
+    const mediaUrls = post.media; // Assuming 'media' stores an array of Cloudinary URLs
+    const publicIds = mediaUrls.map((url) => {
+      const parts = url.split("/");
+      const publicIdWithExtension = parts[parts.length - 1]; // Get the file name with extension
+      return publicIdWithExtension.split(".")[0]; // Remove the extension
+    });
+
+    // Delete media files from Cloudinary
+    for (const publicId of publicIds) {
+      await deleteFromCloudinary(publicId);
+    }
+
+    // Delete the post from the database
     await Post.deleteOne({ _id: req.params.id });
+
     res.redirect("/admin/dashboard");
   } catch (error) {
-    console.log(error);
+    console.log("Error deleting post:", error);
+    res.status(500).send("An error occurred while deleting the post.");
   }
 });
 

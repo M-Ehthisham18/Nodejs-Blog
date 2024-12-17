@@ -8,7 +8,7 @@
   </div>
 
   <ul class="admin-posts">
-    <% data.forEach(post => { %> <% if (post.body.trim() && post.title.trim()
+    <% data.forEach(post => { %> <% if (post.body && post.title
     !== "") { %>
     <li>
       <a href="/admin/post/<%= post._id %>"> <%= post.title %> &nearr; </a>
@@ -21,9 +21,6 @@
         >
           <input type="submit" value="Delete" class="btn-delete btn" />
 
-          <!-- <button type="submit" value="Delete" class="btn">
-              <i class="fa-solid fa-trash-can" style="color: #ff0000;"></i>
-            </button> -->
         </form>
       </div>
     </li>
