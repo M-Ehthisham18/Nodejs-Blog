@@ -1,3 +1,4 @@
+const { uploadOnCloudinary , deleteFromCloudinary } = require('../utils/cloudinay')
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
@@ -6,31 +7,39 @@ const jwt = require("jsonwebtoken");
 const Post = require("../models/post");
 const multer = require('multer');
 const path = require("path");
-const fs = require('fs')
-
-const { uploadOnCloudinary , deleteFromCloudinary } = require('../utils/cloudinay')
+const fs = require('fs');
+const {message} = require('../middlewares/sendAlert')
+const {upload} = require('../middlewares/multer')
+const {authMiddleware, isLoggedIn} = require('../middlewares/authMiddleware');
 // const upload = require('../utils/multer')
 
-const adminLayout = "../views/layouts/admin";
+const adminLayout = "../views/layouts/admin"; // this is essential to display through layouts/admin.js
 const jwtSecret = process.env.JWT_SECRET;
 
 
+
 // updating field in model
-// async function addMediaFieldToExistingPosts() {
-//   try {
-//     // Add the media field to all existing posts
-//     const result = await Post.updateMany(
-//       { media: { $exists: false } }, // Check if the 'media' field doesn't exist
-//       { $set: { media: [] } } // Set the 'media' field as an empty array
-//     );
-//     console.log("Updated documents:", result);
-//   } catch (error) {
-//     console.error("Error updating documents:", error);
-//   }
-// }
+/**
+ * async function addMediaFieldToExistingPosts() {
+  try {
+    // Add the media field to all existing posts
+    const result = await Post.updateMany(
+      { media: { $exists: false } }, // Check if the 'media' field doesn't exist
+      { $set: { media: [] } } // Set the 'media' field as an empty array
+    );
+    console.log("Updated documents:", result);
+  } catch (error) {
+    console.error("Error updating documents:", error);
+  }
+}
 
-// addMediaFieldToExistingPosts(); 
+addMediaFieldToExistingPosts(); 
+ */
 
+
+// multer
+/**
+ * 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
         cb(null, path.join(__dirname, "../../public/img"))
@@ -42,28 +51,31 @@ const storage = multer.diskStorage({
     //     // cb(null, file.fieldname + '-' + uniqueSuffix)
       }
 });
-
 const upload = multer({ storage });
+ */
 
+
+//auth middle ware
 /**
  * middleware
  * check login
  */
-
-const authMiddleware = (req, res, next) => {
+/**
+ * const authMiddleware = (req, res, next) => {
   try {
-    const token = req.cookies.token; // Use 'cookies' instead of 'cookie'
+    const token = req.cookies.token; // Use 'cookies' to fetch the token
     if (!token) {
-      return res.status(401).json({ message: "Unauthorized" });
+      //send the alert msg, url , time in seconds
+      return res.send(message('Sign In to visit Dashboard 🗓️','/admin/',3));
     }
 
     // Verify the token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET); // Make sure JWT_SECRET is defined
-    req.user = decoded; // Attach the decoded user to the request object for future use
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); 
+    req.user = decoded; // Attach decoded user info to the request object
 
-    next();
+    next(); // Proceed to the next middleware or route handler
   } catch (error) {
-    console.log(error);
+    console.error('Authentication error:', error.message);
     return res.status(403).json({ message: "Forbidden" });
   }
 };
@@ -86,6 +98,9 @@ const isLoggedIn = (req, res, next) => {
   next(); // Proceed to the login page if not logged in
 };
 
+ */
+
+
 /**
  * GET /
  * ADMIN - register page
@@ -97,7 +112,8 @@ router.get("/register", async (req, res) => {
       desc: "This is a register page",
     };
 
-    res.render("admin/register", { locals, layout: adminLayout });
+    // res.render("admin/register", { locals, layout: adminLayout });
+    return res.send('User Registered successfully.','admin/register',2)
   } catch (error) {
     console.log(`something worng while admin page : ${error}`);
   }
@@ -226,7 +242,8 @@ router.get("/dashboard", authMiddleware, async (req, res) => {
  * GET /
  * vist POST - PAGE
  */
-router.get("/post/:id", authMiddleware, async (req, res) => {
+// router.get("/post/:id", authMiddleware, async (req, res) => {
+router.get("/admin-post/:id", authMiddleware, async (req, res) => {
   try {
     const slug = req.params.id;
 
@@ -237,11 +254,12 @@ router.get("/post/:id", authMiddleware, async (req, res) => {
       descriptions: "your post",
     };
 
-    res.render("post", { locals, data });
+    res.render("admin/admin-post", { locals, data, layout:adminLayout });
   } catch (error) {
     console.log(`something went worng while opening post link : ${error}`);
   }
 });
+
 
 /*
  * GET /
@@ -299,10 +317,11 @@ router.post(
       });
       
       await newPost.save(); // Save the post in the database
-      res.redirect("dashboard");
+      // res.redirect("dashboard");
+      return res.send(message('Post add Successfully.', 'dashboard', 1))
     } catch (error) {
       console.log("Error creating post:", error);
-      res.status(500).send("An error occurred while creating the post.");
+      res.status(500).send(message('Failed to add post.', 'dashboard', 1))
     }
   }
 );
@@ -340,7 +359,7 @@ router.put("/edit-post/:id", authMiddleware, async (req, res) => {
     res.redirect("/admin/dashboard");
     // res.redirect(`edit-post/${req.params.id}`);
   } catch (error) {
-    console.log('error in edit-post (put) : ',error);
+    console.log(error);
   }
 });
 
@@ -370,33 +389,79 @@ router.delete("/delete-post/:id", authMiddleware, async (req, res) => {
   try {
     // Retrieve the post to access media URLs
     const post = await Post.findById(req.params.id);
-
+    
     if (!post) {
       return res.status(404).send("Post not found");
     }
-
+    
     // Extract public IDs from Cloudinary URLs
     const mediaUrls = post.media; // Assuming 'media' stores an array of Cloudinary URLs
     const publicIds = mediaUrls.map((url) => {
       const parts = url.split("/");
       const publicIdWithExtension = parts[parts.length - 1]; // Get the file name with extension
+      // console.log(`cloudinary media : ${publicIdWithExtension.split('.')[0]}`);
+      
+      let deletingFile = publicIdWithExtension.split('.')[0];
+      let fileType = publicIdWithExtension.split('.')[1];
+      let resourceType;
+      if (fileType === 'mp4' || fileType === 'avi') {
+        resourceType = 'video'
+      } else {
+        resourceType = 'image'
+      }
+      res.send(message('Post Deleted Successfully.','/admin/dashboard',2))
+      deleteFromCloudinary(deletingFile,resourceType)
+
       return publicIdWithExtension.split(".")[0]; // Remove the extension
     });
 
-    // Delete media files from Cloudinary
-    for (const publicId of publicIds) {
-      await deleteFromCloudinary(publicId);
-    }
 
     // Delete the post from the database
     await Post.deleteOne({ _id: req.params.id });
 
-    res.redirect("/admin/dashboard");
+    // res.redirect("/admin/dashboard");
+
   } catch (error) {
     console.log("Error deleting post:", error);
     res.status(500).send("An error occurred while deleting the post.");
   }
 });
+
+
+router.delete('/delete-media/:postId', async (req, res) => {
+  const { postId } = req.params;
+  const { mediaUrl } = req.body;
+
+  try {
+    // Extract public_id from media URL
+    const publicId = mediaUrl.split('/').pop().split('.')[0];
+    let fileType = mediaUrl.split('/').pop().split('.')[1]
+    // Remove file from Cloudinary
+    let resourceType;
+      if (fileType === 'mp4' || fileType === 'avi') {
+          resourceType = 'video'
+      } else {
+          resourceType = 'image'
+      }
+    await deleteFromCloudinary(publicId,resourceType);
+
+    // Update post in the database
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ message: 'Post not found' });
+    }
+
+    post.media = post.media.filter((media) => media !== mediaUrl);
+    await post.save();
+
+    // res.status(200).json({ message: 'Media deleted successfully' });
+    res.redirect('edit-post')
+  } catch (error) {
+    console.error('Error deleting media:', error);
+    res.status(500).json({ message: 'Failed to delete media' });
+  }
+});
+
 
 /**
  * GET /
@@ -404,7 +469,8 @@ router.delete("/delete-post/:id", authMiddleware, async (req, res) => {
  */
 router.get("/logout", authMiddleware, async (req, res) => {
   res.clearCookie("token");
-  res.redirect("/admin/");
+  // res.redirect("/admin/");
+  return res.send(message('user logout successfully.','/admin/',1))
 });
 
 module.exports = router;

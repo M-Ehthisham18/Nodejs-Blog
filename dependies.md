@@ -30,3 +30,8 @@ npm install
  // DEV DEPENDENCIES
 npm i -D nodemon
 
+<!-- tmro task  -->
+<!-- 
+  1) porperly define carousel in all page 
+  2) on deleting post delete media from cloudinary and database
+ -->

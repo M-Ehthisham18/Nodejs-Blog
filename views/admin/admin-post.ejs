@@ -85,15 +85,26 @@
 </style>
 
 
+<div style="display: flex; justify-content: space-between;">
+  <a href="/admin/dashboard">&larr; Back</a>
+<div class="admin-post-controls">
+  <a href="/admin/edit-post/<%= data._id %>" class="btn">Edit</a>
 
+  <form
+    action="/admin/delete-post/<%= data._id %>?_method=DELETE"
+    method="POST"
+  >
+    <input type="submit" value="Delete" class="btn-delete btn" style="background-color: #b30000; color: white;" />
+
+  </form>
+</div>
+</div>
 <h1 style="font-size: xx-large; text-align: center; padding: 24px 0;"><%= data.title %></h1>
 <article class="article"><%= data.body %></article>
-gjc
+
 <div class="hero-image" width="981" height="528">
 
 
-  
-      
 
 
 <div class="carousel-container">

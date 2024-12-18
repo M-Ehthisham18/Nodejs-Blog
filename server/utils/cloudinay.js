@@ -34,9 +34,10 @@ const uploadOnCloudinary = async (localFilePath) => {
 }
 
 // delete file from cloudinary in case of failed to createUser
-const deleteFromCloudinary = async (publicId) => {
+// type of file (resourceType) need to be decleared separately
+const deleteFromCloudinary = async (publicId,resourceType) => {
   try {
-    const result = await cloudinary.uploader.destroy(publicId)
+    const result = await cloudinary.uploader.destroy(publicId , { resource_type: resourceType})
     console.log("Delete from cloudinary. public Id : ",publicId);
     
   } catch (error) {
