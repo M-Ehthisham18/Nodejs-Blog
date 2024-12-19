@@ -1,127 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <title>Carousel Example</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-    }
+  <head>
+    <title>Carousel Example</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+      }
 
-    .carousel-container {
-      position: relative;
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
-      overflow: hidden;
-    }
+      .carousel-container {
+        position: relative;
+        width: 100%;
+        max-width: 800px;
+        margin: 0 auto;
+        overflow: hidden;
+      }
 
-    .carousel-slides {
-      display: flex;
-      transition: transform 0.5s ease-in-out;
-    }
+      .carousel-slides {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+      }
 
-    .carousel-item {
-      position: relative;
-      min-width: 100%;
-      box-sizing: border-box;
-    }
+      .carousel-item {
+        position: relative;
+        min-width: 100%;
+        box-sizing: border-box;
+      }
 
-    .carousel-item img {
-      width: 100%;
-      display: block;
-    }
+      .carousel-item img {
+        width: 100%;
+        display: block;
+      }
 
-    .carousel-caption {
-      position: absolute;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0, 0, 0, 0.5);
-      color: white;
-      padding: 10px 20px;
-      border-radius: 5px;
-      text-align: center;
-    }
+      .carousel-caption {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        a {
+          color: white;
+          text-decoration: none;
+          font-size: 1.3rem;
+          @media (max-width: 520px) {
+            font-size: 1rem;
+          }
+        }
+        @media (max-width: 600px) {
+          padding: 8px 14px;
+          margin-bottom: 5px;
+        }
+      }
 
-    .carousel-indicators {
-      position: absolute;
-      bottom: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 5px;
-    }
+      .carousel-indicators {
+        position: absolute;
+        bottom: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 5px;
+      }
 
-    .indicator {
-      width: 10px;
-      height: 10px;
-      background: lightgray;
-      border-radius: 50%;
-      cursor: pointer;
-    }
+      .indicator {
+        width: 10px;
+        height: 10px;
+        background: lightgray;
+        border-radius: 50%;
+        cursor: pointer;
+      }
 
-    .indicator.active {
-      background: gray;
-    }
+      .indicator.active {
+        background: gray;
+      }
 
-    .carousel-control {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(0, 0, 0, 0.5);
-      color: white;
-      border: none;
-      font-size: 18px;
-      padding: 10px;
-      cursor: pointer;
-    }
+      .carousel-control {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        font-size: 18px;
+        padding: 10px;
+        cursor: pointer;
+      }
 
-    .carousel-control.left {
-      left: 10px;
-    }
+      .carousel-control.left {
+        left: 10px;
+      }
 
-    .carousel-control.right {
-      right: 10px;
-    }
-  </style>
-</head>
-<body>
-
-<div class="carousel-container">
+      .carousel-control.right {
+        right: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="carousel-container">
   <!-- Wrapper for slides -->
   <div class="carousel-slides">
-    <div class="carousel-item">
-      <img src="https://picsum.photos/id/237/800/400" alt="Los Angeles">
-      <div class="carousel-caption">
-        <h3>Los Angeles</h3>
-        <p>LA is always so much fun!</p>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <img src="https://picsum.photos/id/236/800/400" alt="Chicago">
-      <div class="carousel-caption">
-        <h3>Chicago</h3>
-        <p>Thank you, Chicago!</p>
-      </div>
-    </div>
-    <div class="carousel-item">
-      <img src="https://picsum.photos/id/235/800/400" alt="New York">
-      <div class="carousel-caption">
-        <h3>New York</h3>
-        <p>We love the Big Apple!</p>
-      </div>
-    </div>
+    <% let validMedia = []; %>
+    <!-- Array to track valid media -->
+
+    <% data.forEach(post => { %> 
+      <% let firstMediaProcessed = false; %> <!-- Control flag -->
+      <% post.media.forEach(media => { %> 
+        <% if (firstMediaProcessed) return; %> <!-- Simulate break -->
+        <% if (media) { %> 
+          <% 
+            // Extract file extension and convert to lowercase
+            const extension = media.split('.').pop().toLowerCase(); 
+          %>
+          <% if (['mp4', 'webm', 'ogg', 'png', 'jpg', 'jpeg', 'webp'].includes(extension)) { %>
+            <% validMedia.push(media); %> <!-- Add valid media to array -->
+            <div class="carousel-item">
+              <% if (['mp4', 'webm', 'ogg'].includes(extension)) { %>
+                <!-- Render video -->
+                <video width="100%" height="100%" style="border-radius: 8px" 
+                controls autoplay muted>
+                  <source src="<%= media %>" type="video/<%= extension %>" />
+                  Your browser does not support the video tag.
+                </video>
+              <% } else { %>
+                <!-- Render image -->
+                <img
+                  src="<%= media %>"
+                  class="hero-image"
+                  alt="Media"
+                  width="981"
+                  height="528"
+                />
+              <% } %>
+              <div class="carousel-caption">
+                <a href="/post/<%= post._id %>"><%= post.title %></a>
+              </div>
+            </div>
+            <% firstMediaProcessed = true; %> <!-- Set flag to true -->
+          <% } %> 
+        <% } %>
+      <% }) %> 
+    <% }) %>
   </div>
 
   <!-- Indicators -->
   <div class="carousel-indicators">
-    <div class="indicator active" data-slide="0"></div>
-    <div class="indicator" data-slide="1"></div>
-    <div class="indicator" data-slide="2"></div>
+    <% validMedia.forEach((_, index) => { %>
+      <div
+        class="indicator <%= index === 0 ? 'active' : '' %>"
+        data-slide="<%= index %>"
+      ></div>
+    <% }) %>
   </div>
 
   <!-- Left and right controls -->
@@ -129,73 +163,73 @@
   <button class="carousel-control right">&gt;</button>
 </div>
 
-<script>
-  const slides = document.querySelector('.carousel-slides');
-  const items = document.querySelectorAll('.carousel-item');
-  const indicators = document.querySelectorAll('.indicator');
-  const prevButton = document.querySelector('.carousel-control.left');
-  const nextButton = document.querySelector('.carousel-control.right');
-  
-  let currentIndex = 0;
-  let autoSlideInterval;
 
-  // Function to update carousel to a specific index
-  function updateCarousel(index) {
-    const offset = -index * 100; // Shift by percentage of the slide width
-    slides.style.transform = `translateX(${offset}%)`;
+    <script>
+      const slides = document.querySelector(".carousel-slides");
+      const items = document.querySelectorAll(".carousel-item");
+      const indicators = document.querySelectorAll(".indicator");
+      const prevButton = document.querySelector(".carousel-control.left");
+      const nextButton = document.querySelector(".carousel-control.right");
 
-    // Update active indicator
-    indicators.forEach((indicator, i) => {
-      indicator.classList.toggle('active', i === index);
-    });
-  }
+      let currentIndex = 0;
+      let autoSlideInterval;
 
-  // Next Slide
-  function nextSlide() {
-    currentIndex = (currentIndex + 1) % items.length;
-    updateCarousel(currentIndex);
-  }
+      // Function to update carousel to a specific index
+      function updateCarousel(index) {
+        const offset = -index * 100; // Shift by percentage of the slide width
+        slides.style.transform = `translateX(${offset}%)`;
 
-  // Previous Slide
-  function prevSlide() {
-    currentIndex = (currentIndex - 1 + items.length) % items.length;
-    updateCarousel(currentIndex);
-  }
+        // Update active indicator
+        indicators.forEach((indicator, i) => {
+          indicator.classList.toggle("active", i === index);
+        });
+      }
 
-  // Indicator Click
-  indicators.forEach((indicator, index) => {
-    indicator.addEventListener('click', () => {
-      currentIndex = index;
-      updateCarousel(currentIndex);
-      resetAutoSlide(); // Reset auto-slide when clicked
-    });
-  });
+      // Next Slide
+      function nextSlide() {
+        currentIndex = (currentIndex + 1) % items.length;
+        updateCarousel(currentIndex);
+      }
 
-  // Auto-slide every 5 seconds
-  function startAutoSlide() {
-    autoSlideInterval = setInterval(nextSlide, 5000);
-  }
+      // Previous Slide
+      function prevSlide() {
+        currentIndex = (currentIndex - 1 + items.length) % items.length;
+        updateCarousel(currentIndex);
+      }
 
-  // Reset auto-slide timer
-  function resetAutoSlide() {
-    clearInterval(autoSlideInterval);
-    startAutoSlide();
-  }
+      // Indicator Click
+      indicators.forEach((indicator, index) => {
+        indicator.addEventListener("click", () => {
+          currentIndex = index;
+          updateCarousel(currentIndex);
+          resetAutoSlide(); // Reset auto-slide when clicked
+        });
+      });
 
-  // Attach button click events
-  nextButton.addEventListener('click', () => {
-    nextSlide();
-    resetAutoSlide(); // Reset auto-slide when clicked
-  });
+      // Auto-slide every 5 seconds
+      function startAutoSlide() {
+        autoSlideInterval = setInterval(nextSlide, 2000);
+      }
 
-  prevButton.addEventListener('click', () => {
-    prevSlide();
-    resetAutoSlide(); // Reset auto-slide when clicked
-  });
+      // Reset auto-slide timer
+      function resetAutoSlide() {
+        clearInterval(autoSlideInterval);
+        startAutoSlide();
+      }
 
-  // Start auto-slide when the page loads
-  startAutoSlide();
-</script>
+      // Attach button click events
+      nextButton.addEventListener("click", () => {
+        nextSlide();
+        resetAutoSlide(); // Reset auto-slide when clicked
+      });
 
-</body>
+      prevButton.addEventListener("click", () => {
+        prevSlide();
+        resetAutoSlide(); // Reset auto-slide when clicked
+      });
+
+      // Start auto-slide when the page loads
+      startAutoSlide();
+    </script>
+  </body>
 </html>

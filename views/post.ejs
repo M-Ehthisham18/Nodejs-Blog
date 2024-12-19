@@ -85,10 +85,10 @@
 </style>
 
 
-
+<a href="/">&larr; Back</a>
 <h1 style="font-size: xx-large; text-align: center; padding: 24px 0;"><%= data.title %></h1>
 <article class="article"><%= data.body %></article>
-gjc
+
 <div class="hero-image" width="981" height="528">
 
 
@@ -200,7 +200,7 @@ indicators.forEach((indicator, index) => {
 
 // Auto-slide every 5 seconds
 function startAutoSlide() {
-  autoSlideInterval = setInterval(nextSlide, 5000);
+  autoSlideInterval = setInterval(nextSlide, 3000);
 }
 
 // Reset auto-slide timer

@@ -1,13 +1,10 @@
-const { uploadOnCloudinary , deleteFromCloudinary } = require('../utils/cloudinay')
 const express = require("express");
+const { uploadOnCloudinary , deleteFromCloudinary } = require('../utils/cloudinay')
 const router = express.Router();
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const Post = require("../models/post");
-const multer = require('multer');
-const path = require("path");
-const fs = require('fs');
 const {message} = require('../middlewares/sendAlert')
 const {upload} = require('../middlewares/multer')
 const {authMiddleware, isLoggedIn} = require('../middlewares/authMiddleware');
@@ -393,74 +390,43 @@ router.delete("/delete-post/:id", authMiddleware, async (req, res) => {
     if (!post) {
       return res.status(404).send("Post not found");
     }
-    
-    // Extract public IDs from Cloudinary URLs
-    const mediaUrls = post.media; // Assuming 'media' stores an array of Cloudinary URLs
-    const publicIds = mediaUrls.map((url) => {
-      const parts = url.split("/");
-      const publicIdWithExtension = parts[parts.length - 1]; // Get the file name with extension
-      // console.log(`cloudinary media : ${publicIdWithExtension.split('.')[0]}`);
-      
-      let deletingFile = publicIdWithExtension.split('.')[0];
-      let fileType = publicIdWithExtension.split('.')[1];
-      let resourceType;
-      if (fileType === 'mp4' || fileType === 'avi') {
-        resourceType = 'video'
-      } else {
-        resourceType = 'image'
-      }
-      res.send(message('Post Deleted Successfully.','/admin/dashboard',2))
-      deleteFromCloudinary(deletingFile,resourceType)
 
-      return publicIdWithExtension.split(".")[0]; // Remove the extension
+    // Extract media URLs and delete each media from Cloudinary
+    const mediaUrls = post.media; // Assuming 'media' stores an array of Cloudinary URLs
+    const deletePromises = mediaUrls.map((url) => {
+      const parts = url.split('/');
+      const publicIdWithExtension = parts[parts.length - 1]; // Get the file name with extension
+
+      // Extract public ID without file extension
+      const deletingFile = publicIdWithExtension.split('.')[0];
+      const fileType = publicIdWithExtension.split('.')[1];
+
+      // Determine the resource type (image or video)
+      let resourceType;
+      if (['mp4', 'avi', 'mov'].includes(fileType)) {
+        resourceType = 'video';
+      } else {
+        resourceType = 'image';
+      }
+
+      // Delete the media from Cloudinary
+      return deleteFromCloudinary(deletingFile, resourceType);
     });
 
+    // Wait for all deletions to complete
+    await Promise.all(deletePromises);
 
     // Delete the post from the database
     await Post.deleteOne({ _id: req.params.id });
 
-    // res.redirect("/admin/dashboard");
-
+    // Send success message after successful deletion
+    return res.send(message('Post Deleted Successfully.', '/admin/dashboard', 2));
   } catch (error) {
     console.log("Error deleting post:", error);
     res.status(500).send("An error occurred while deleting the post.");
   }
 });
 
-
-router.delete('/delete-media/:postId', async (req, res) => {
-  const { postId } = req.params;
-  const { mediaUrl } = req.body;
-
-  try {
-    // Extract public_id from media URL
-    const publicId = mediaUrl.split('/').pop().split('.')[0];
-    let fileType = mediaUrl.split('/').pop().split('.')[1]
-    // Remove file from Cloudinary
-    let resourceType;
-      if (fileType === 'mp4' || fileType === 'avi') {
-          resourceType = 'video'
-      } else {
-          resourceType = 'image'
-      }
-    await deleteFromCloudinary(publicId,resourceType);
-
-    // Update post in the database
-    const post = await Post.findById(postId);
-    if (!post) {
-      return res.status(404).json({ message: 'Post not found' });
-    }
-
-    post.media = post.media.filter((media) => media !== mediaUrl);
-    await post.save();
-
-    // res.status(200).json({ message: 'Media deleted successfully' });
-    res.redirect('edit-post')
-  } catch (error) {
-    console.error('Error deleting media:', error);
-    res.status(500).json({ message: 'Failed to delete media' });
-  }
-});
 
 
 /**
