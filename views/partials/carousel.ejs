@@ -21,6 +21,7 @@
 
       .carousel-slides {
         display: flex;
+        align-items: center;
         transition: transform 0.5s ease-in-out;
       }
 
@@ -66,6 +67,8 @@
         transform: translateX(-50%);
         display: flex;
         gap: 5px;
+        z-index: 20;
+
       }
 
       .indicator {
@@ -74,10 +77,12 @@
         background: lightgray;
         border-radius: 50%;
         cursor: pointer;
+        z-index: 20;
       }
 
       .indicator.active {
         background: gray;
+        z-index: 20;
       }
 
       .carousel-control {
@@ -90,6 +95,7 @@
         font-size: 18px;
         padding: 10px;
         cursor: pointer;
+        z-index: 20;
       }
 
       .carousel-control.left {
@@ -99,6 +105,23 @@
       .carousel-control.right {
         right: 10px;
       }
+      .carousel-item {
+        position: absolute; /* Required for z-index to take effect */
+
+  transition: opacity 0.5s ease-in-out, z-index 0s linear 0.5s; /* Fade effect */
+  opacity: 0;
+  z-index: 0;
+  }
+
+  .carousel-item.active {
+    opacity: 1;
+    z-index: 10;
+    position: relative; /* Bring active slide to the front */
+  }
+
+  .carousel-slides {
+    position: relative; /* Adjust for absolute positioning of items */
+  }
     </style>
   </head>
   <body>
@@ -120,6 +143,7 @@
           <% if (['mp4', 'webm', 'ogg', 'png', 'jpg', 'jpeg', 'webp'].includes(extension)) { %>
             <% validMedia.push(media); %> <!-- Add valid media to array -->
             <div class="carousel-item">
+              <a href="/post/<%= post._id%>">
               <% if (['mp4', 'webm', 'ogg'].includes(extension)) { %>
                 <!-- Render video -->
                 <video width="100%" height="100%" style="border-radius: 8px" 
@@ -137,14 +161,15 @@
                   height="528"
                 />
               <% } %>
+              <% firstMediaProcessed = true; %> <!-- Set flag to true -->
+              <% } %> 
+              <% } %>
               <div class="carousel-caption">
-                <a href="/post/<%= post._id %>"><%= post.title %></a>
+                <%= post.title %>
               </div>
+            </a>
             </div>
-            <% firstMediaProcessed = true; %> <!-- Set flag to true -->
-          <% } %> 
-        <% } %>
-      <% }) %> 
+              <% }) %> 
     <% }) %>
   </div>
 
@@ -164,72 +189,82 @@
 </div>
 
 
-    <script>
-      const slides = document.querySelector(".carousel-slides");
-      const items = document.querySelectorAll(".carousel-item");
-      const indicators = document.querySelectorAll(".indicator");
-      const prevButton = document.querySelector(".carousel-control.left");
-      const nextButton = document.querySelector(".carousel-control.right");
+<script>
+  const slides = document.querySelectorAll(".carousel-item");
+  const indicators = document.querySelectorAll(".indicator");
+  const prevButton = document.querySelector(".carousel-control.left");
+  const nextButton = document.querySelector(".carousel-control.right");
 
-      let currentIndex = 0;
-      let autoSlideInterval;
+  let currentIndex = 0;
+  let autoSlideInterval;
 
-      // Function to update carousel to a specific index
-      function updateCarousel(index) {
-        const offset = -index * 100; // Shift by percentage of the slide width
-        slides.style.transform = `translateX(${offset}%)`;
+  // Function to update the carousel with fade effect
+  function updateCarousel(index) {
+    /* slides.forEach((slide, i) => {
+      slide.classList.toggle("active", i === index); // Show the active slide
+    }); */
 
-        // Update active indicator
-        indicators.forEach((indicator, i) => {
-          indicator.classList.toggle("active", i === index);
-        });
-      }
+    slides.forEach((slide, i) => {
+    const isActive = i === index;
+    slide.classList.toggle("active", isActive); // Show the active slide
+    slide.style.zIndex = isActive ? "10" : "0"; // Set z-index for active and non-active slides
+  });
 
-      // Next Slide
-      function nextSlide() {
-        currentIndex = (currentIndex + 1) % items.length;
-        updateCarousel(currentIndex);
-      }
+    // Update active indicator
+    indicators.forEach((indicator, i) => {
+      indicator.classList.toggle("active", i === index);
+    });
+  }
 
-      // Previous Slide
-      function prevSlide() {
-        currentIndex = (currentIndex - 1 + items.length) % items.length;
-        updateCarousel(currentIndex);
-      }
+  // Next Slide
+  function nextSlide() {
+    currentIndex = (currentIndex + 1) % slides.length;
+    updateCarousel(currentIndex);
+  }
 
-      // Indicator Click
-      indicators.forEach((indicator, index) => {
-        indicator.addEventListener("click", () => {
-          currentIndex = index;
-          updateCarousel(currentIndex);
-          resetAutoSlide(); // Reset auto-slide when clicked
-        });
-      });
+  // Previous Slide
+  function prevSlide() {
+    currentIndex = (currentIndex - 1 + slides.length) % slides.length;
+    updateCarousel(currentIndex);
+  }
 
-      // Auto-slide every 5 seconds
-      function startAutoSlide() {
-        autoSlideInterval = setInterval(nextSlide, 2000);
-      }
+  // Indicator Click
+  indicators.forEach((indicator, index) => {
+    indicator.addEventListener("click", () => {
+      currentIndex = index;
+      updateCarousel(currentIndex);
+      resetAutoSlide(); // Reset auto-slide when clicked
+    });
+  });
 
-      // Reset auto-slide timer
-      function resetAutoSlide() {
-        clearInterval(autoSlideInterval);
-        startAutoSlide();
-      }
+  // Auto-slide every 5 seconds
+  function startAutoSlide() {
+    autoSlideInterval = setInterval(nextSlide, 2000);
+  }
 
-      // Attach button click events
-      nextButton.addEventListener("click", () => {
-        nextSlide();
-        resetAutoSlide(); // Reset auto-slide when clicked
-      });
+  // Reset auto-slide timer
+  function resetAutoSlide() {
+    clearInterval(autoSlideInterval);
+    startAutoSlide();
+  }
 
-      prevButton.addEventListener("click", () => {
-        prevSlide();
-        resetAutoSlide(); // Reset auto-slide when clicked
-      });
+  // Attach button click events
+  nextButton.addEventListener("click", () => {
+    nextSlide();
+    resetAutoSlide(); // Reset auto-slide when clicked
+  });
 
-      // Start auto-slide when the page loads
-      startAutoSlide();
-    </script>
+  prevButton.addEventListener("click", () => {
+    prevSlide();
+    resetAutoSlide(); // Reset auto-slide when clicked
+  });
+
+  // Initialize the carousel
+  updateCarousel(currentIndex);
+
+  // Start auto-slide when the page loads
+  startAutoSlide();
+</script>
+
   </body>
 </html>

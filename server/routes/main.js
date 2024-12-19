@@ -59,13 +59,6 @@ router.get("", async (req, res) => {
     // for next page
     const nextPage = parseInt(page) - 1;
     const hasNextPage = nextPage > 0;
-    data.forEach( element  => {
-      // let filesss = element.media
-      element.media.forEach(f => {
-
-        console.log(`data : ${f}`);
-      })
-    });
     
     res.render("index", {
       locals,
