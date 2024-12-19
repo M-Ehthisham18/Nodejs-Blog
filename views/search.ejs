@@ -1,19 +1,43 @@
+<style>
+  .btn-back {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 16px;
+}
+
+.btn-back:hover {
+  background-color: #0056b3;
+}
+
+</style>
+
 <div class="author">
   <h1 class="author__heading">Search Results</h1>
+  <p>Post with keyword : (<%= searchTerm %>)</p>
 </div>
 
 <section class="articles">
 
-  <ul class="article-ul">
-    <% data.forEach(post => { %>
-      <li>
-        <a href="/post/<%= post._id %>">
-          <span><%= post.title %></span>
-          <span class="article-list__date"><%= post.createdAt.toDateString() %></span>
-        </a>
-      </li>
-    <% }) %>
-  </ul>
-
+  <% if (data && data.length > 0) { %>
+   
+    <ul class="article-ul">
+      <% data.forEach(post => { %>
+        <li>
+          <a href="/post/<%= post._id %>">
+            <span><%= post.title %></span>
+            <span class="article-list__date"><%= post.createdAt.toDateString() %></span>
+          </a>
+        </li>
+      <% }) %>
+    </ul>
+  <% } else { %>
+    <h1>Post with keyword (<%= searchTerm %>) Not Found</h1>
+    <a href="/" class="btn-back">Back to Home</a>
+  <% } %>
 
 </section>

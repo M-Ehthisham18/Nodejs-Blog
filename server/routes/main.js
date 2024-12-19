@@ -124,7 +124,6 @@ router.post("/search", async (req, res) => {
     };
 
     let searchTerm = req.body.searchTerm.replace(/[^a-zA-Z09]/g, "");
-    console.log(searchTerm);
 
     const data = await Post.find({
       $or: [
@@ -133,7 +132,7 @@ router.post("/search", async (req, res) => {
       ],
     });
 
-    res.render("search", { locals, data });
+    res.render("search", { locals, data ,searchTerm});
   } catch (error) {
     console.log(`something went worng while searching : ${error}`);
   }

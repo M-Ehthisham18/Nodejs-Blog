@@ -1,3 +1,128 @@
+<style>
+  /* General Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Form Container */
+.form-container {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+/* Back Button Style */
+.back-button {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.btn-back {
+    background-color: #ccc;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    border: 1px solid #bbb;
+    transition: background-color 0.3s ease;
+}
+
+.btn-back:hover {
+    background-color: #bbb;
+    color: #000;
+}
+/* Form Group */
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    font-size: 1rem;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="text"], textarea, input[type="file"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 1rem;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+input[type="file"] {
+    padding: 5px;
+}
+
+textarea {
+    resize: vertical;
+}
+
+input[type="submit"] {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+/* Media Types Tooltip */
+label[for="media"] {
+    font-size: 0.9rem;
+    color: #555;
+}
+
+input[type="file"]:not(:focus) {
+    border-color: #007bff;
+}
+
+input[type="file"]:focus {
+    border-color: #0056b3;
+    outline: none;
+}
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .form-container {
+        padding: 15px;
+    }
+
+    input[type="text"], textarea {
+        font-size: 0.9rem;
+    }
+
+    input[type="submit"] {
+        padding: 10px 20px;
+    }
+}
+
+</style>
+<div class="back-button">
+  <a href="/admin/dashboard" class="btn-back">&larr; Back </a>
+</div>
 <form action="/admin/add-post" method="POST" enctype="multipart/form-data">
   <label for="title"><b>Title</b></label>
   <input type="text" id="title" placeholder="Post Title" name="title" autofocus required maxlength="150">

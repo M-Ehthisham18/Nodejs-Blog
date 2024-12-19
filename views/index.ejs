@@ -1,61 +1,182 @@
-<style>
-  .pagination-button{
-    display: flex;
-    justify-content: space-between;
-    
-  }
-</style>
-<div class="author">
-  <h1 class="author__heading">Hi, I am Ehthisham.</h1>
-  <p class="author__body">Web developer and content creator.</p>
-</div>
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blog</title>
+    <style>
+      /* General body styles */
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+        color: #333;
+      }
 
+      /* Author section */
+      .author {
+        text-align: center;
+        margin: 20px 0;
+      }
 
-<%- include('./partials/carousel.ejs', { data: data }) %>
-  
+      .author__heading {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #333;
+      }
 
-<section class="articles">
-  <h2 class="articles__heading">Latest Posts</h2>
+      .author__body {
+        font-size: 1.2rem;
+        color: #555;
+      }
 
-  <ul class="article-ul">
-    
-    <% data.forEach(post => { %>
+      /* Articles section */
+      .articles {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        /* background-color: white; */
+        border-radius: 10px;
+        /* box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); */
+      }
 
-      <% if (post.title && post.title.trim() !== "") { %>
-        <li>
-          <a href="/post/<%= post._id  %>">
-            <span>
-              <%= post.title %>
-            </span>
-            <span class="article-list__date">
-              <%= post.createdAt.toDateString() %>
-            </span>
-          </a>
-        </li>
-        <% } %>
+      .articles__heading {
+        font-size: 2.5rem;
+        margin-bottom: 20px;
+        text-align: center;
+        color: #007bff;
+      }
+
+      .article-ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .article-ul li {
+        background-color: #fafafa;
+        margin-bottom: 15px;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s ease;
+      }
+
+      .article-ul li:hover {
+        background-color: #f1f1f1;
+      }
+
+      .article-ul li a {
+        text-decoration: none;
+        color: #333;
+        font-size: 1.1rem;
+        display: flex;
+        justify-content: space-between;
+        /* align-items: center; */
+        font-weight: bold;
+      }
+
+      .article-list__date {
+        font-size: 0.9rem;
+        color: #888;
+        /* margin-left: 15px; */
+        padding: 16px 0px 0 0 ;
+        width: 200px;
+        font-weight: lighter;
+      }
+
+      /* Pagination */
+      .pagination-button {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+      }
+
+      .pagination {
+        text-decoration: none;
+        color: #007bff;
+        font-size: 1.1rem;
+        padding: 8px 15px;
+        border: 1px solid #007bff;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+
+      .pagination:hover {
+        background-color: #e6f2ff;
+      }
+
+      /* Admin Button */
+      .login-btn {
+        padding: 12px 25px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        text-align: center;
+        transition: background-color 0.3s ease;
+      }
+
+      .login-btn:hover {
+        background-color: #0056b3;
+      }
+
+      /* Admin section positioning */
+      .admin-section {
+        display: flex;
+        justify-content: flex-end;
+        margin-top: 30px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="author">
+      <h1 class="author__heading">Hi, I am Ehthisham.</h1>
+      <p class="author__body">Web developer and content creator.</p>
+    </div>
+
+    <!-- Include Carousel Section -->
+    <%- include('./partials/carousel.ejs', { data: data }) %>
+
+    <!-- Articles Section -->
+    <section class="articles">
+      <h2 class="articles__heading">Latest Posts</h2>
+
+      <ul class="article-ul">
+        <% data.forEach(post => { %>
+          <% if (post.title && post.title.trim() !== "") { %>
+            <li>
+              <a href="/post/<%= post._id %>">
+                <span><%= post.title %></span>
+                <span class="article-list__date"><%= post.createdAt.toDateString() %></span>
+              </a>
+            </li>
+          <% } %>
         <% }) %>
-      
-  </ul>
-  
-  <div class="pagination-button">
-    <div>
-      <% if (previousPage !== null) { %>
-        <a href="/?page=<%= previousPage %>" class="pagination">&lt; Previous</a>
-      <% } %>
-    </div>
-    <div>
-      <% if (nextPage !== null) { %>
-        <a href="/?page=<%= nextPage %>" class="pagination">Next &gt;</a>
-      <% } %>
-    </div>
-  </div>
+      </ul>
 
-</section>
-<div style="display: flex; justify-content: space-between;">
-  <div></div>
-  <a href="/admin">
-    <button class="login-btn">
-    Admin
-  </button>
-  </a>
-</div>
+      <!-- Pagination Section -->
+      <div class="pagination-button">
+        <div>
+          <% if (previousPage !== null) { %>
+            <a href="/?page=<%= previousPage %>" class="pagination">&lt; Previous</a>
+          <% } %>
+        </div>
+        <div>
+          <% if (nextPage !== null) { %>
+            <a href="/?page=<%= nextPage %>" class="pagination">Next &gt;</a>
+          <% } %>
+        </div>
+      </div>
+    </section>
+
+    <!-- Admin Button Section -->
+    <div class="admin-section">
+      <a href="/admin">
+        <button class="login-btn">Admin</button>
+      </a>
+    </div>
+  </body>
+</html>

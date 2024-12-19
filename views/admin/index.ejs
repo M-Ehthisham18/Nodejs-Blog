@@ -1,16 +1,86 @@
+<style>
+  /* Back Button Style */
+.back-button {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.btn-back {
+    background-color: #ccc;
+    color: #333;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1rem;
+    border: 1px solid #bbb;
+    transition: background-color 0.3s ease;
+}
+
+.btn-back:hover {
+    background-color: #bbb;
+    color: #000;
+}
+
+/* Form Container */
+.form-container {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Form Inputs */
+.form-group {
+    margin-bottom: 20px;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+input[type="submit"] {
+
+    padding: 10px 24px;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    font-size: 1rem;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+</style>
+
 <h3>Sign In</h3>
 
-<form action="/admin" method="POST">
+    <form action="/admin" method="POST">
+        <div class="form-group">
+            <label for="username"><b>Username</b></label>
+            <input type="text" placeholder="Enter Username" name="username" autofocus required>
+        </div>
 
-  <label for="username"><b>Username</b></label>
-  <input type="text" placeholder="Enter Username" name="username" autofocus required>
+        <div class="form-group">
+            <label for="password"><b>Password</b></label>
+            <input type="password" placeholder="Enter Password" name="password" required>
+        </div>
 
-  <label for="password"><b>Password</b></label>
-  <input type="password" placeholder="Enter Password" name="password" required>
-
-  <input type="submit" value="Login" class="btn">
-
-</form>
+        <div class="form-group">
+            <input type="submit" value="Login" class="btn">
+        </div>
+    </form>
 
 <!-- <h3>Register</h3>
 <form action="/admin/register" method="POST">
