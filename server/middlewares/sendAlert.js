@@ -1,7 +1,11 @@
-
 // Function to generate dynamic HTML response
 
-function message(msg,url,time=2) {
+function message(msg, url, time = 2, status = 200) {
+  if (status < 300 && status >= 200) {
+    // msg = `<strong>Success:</strong> ${msg}`;
+    ``;
+  } else {
+  }
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -9,6 +13,10 @@ function message(msg,url,time=2) {
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Redirecting...</title>
+      <script
+  src="https://unpkg.com/@dotlottie/player-component@2.7.12/dist/dotlottie-player.mjs"
+  type="module"
+></script>
       <style>
         body {
           display: flex;
@@ -36,7 +44,7 @@ function message(msg,url,time=2) {
           width: 100%;
           height: 4px;
           background-color: #007bff;
-          animation: loading ${time*1000}ms linear forwards;
+          animation: loading ${time * 1000}ms linear forwards;
         }
         @keyframes loading {
           from {
@@ -50,18 +58,29 @@ function message(msg,url,time=2) {
     </head>
     <body>
     <div class="loading-line"></div>
+      <div>
+        <dotlottie-player
+  src="https://lottie.host/3110ec31-9892-4ee9-9994-a41e8411e31c/l6cThkiRjH.lottie"
+  background="transparent"
+  speed="1.5"
+  style="width: 300px; height: 300px; display: block; margin: 0 auto;"
+  loop
+  autoplay
+></dotlottie-player>
       <div class="alert-box">
         ${msg}
+      </div>
       </div>
       <script>
         // Wait for 3 seconds, then redirect to the admin page
         setTimeout(() => {
           window.location.href = '${url}';
         }, ${time * 1000});
+        
       </script>
     </body>
     </html>
   `;
 }
 
-module.exports = {message}
+module.exports = { message };

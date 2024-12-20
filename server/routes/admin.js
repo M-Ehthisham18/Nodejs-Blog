@@ -152,7 +152,9 @@ router.get("/", isLoggedIn,async (req, res) => {
       signIn: "signIn",
     };
 
-    res.render("admin/index", { locals, layout: adminLayout });
+    res.render("admin/index", { locals, layout: adminLayout }); 
+  
+
   } catch (error) {
     console.log(`something worng while admin page : ${error}`);
   }
@@ -359,6 +361,10 @@ router.put("/edit-post/:id", authMiddleware, async (req, res) => {
     console.log(error);
   }
 });
+
+
+
+
 
 /**
  * GET /

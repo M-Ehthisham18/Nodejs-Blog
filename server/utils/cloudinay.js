@@ -21,7 +21,7 @@ const uploadOnCloudinary = async (localFilePath) => {
         resource_type : "auto"
       }
     )
-    console.log(`file uplaoded on cloudinary. file src : ${response.url}`);
+    // console.log(`file uplaoded on cloudinary. file src : ${response.url}`);
     //once the file is uploaded ,we would like to delete it from our server
     fs.unlinkSync(localFilePath)
     return response;
@@ -38,7 +38,7 @@ const uploadOnCloudinary = async (localFilePath) => {
 const deleteFromCloudinary = async (publicId,resourceType) => {
   try {
     const result = await cloudinary.uploader.destroy(publicId , { resource_type: resourceType})
-    console.log("Delete from cloudinary. public Id : ",publicId);
+    // console.log("Delete from cloudinary. public Id : ",publicId);
     
   } catch (error) {
     console.log("error deleting from cloudinary :",error);
