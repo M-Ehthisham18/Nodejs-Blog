@@ -294,7 +294,8 @@ router.post(
     try {
       const { title, body } = req.body;
       const mediaUrls = [];
-
+      console.log(req.files);
+      
       // Access files from req.files
       if (req.files && req.files.length > 0) {
         for (const file of req.files) {
@@ -337,7 +338,7 @@ router.get("/edit-post/:id", authMiddleware, async (req, res) => {
       body: "editing post",
     };
     const data = await Post.findOne({ _id: req.params.id });
-
+    
     res.render("admin/edit-post", { data, locals, layout: adminLayout });
   } catch (error) {
     console.log('error in edit post (get) : ',error);
@@ -348,22 +349,50 @@ router.get("/edit-post/:id", authMiddleware, async (req, res) => {
  * PUT /
  * edit POST - PAGE
  */
-router.put("/edit-post/:id", authMiddleware, async (req, res) => {
+router.put("/edit-post/:id", authMiddleware, upload.array("media", 10), async (req, res) => {
   try {
-    await Post.findByIdAndUpdate(req.params.id, {
-      title: req.body.title,
-      body: req.body.body,
+
+    const postId = req.params.id;
+
+    // Fetch the existing post
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({ error: "Post not found" });
+    }
+
+    let mediaUrls = post.media || []; // Retain existing media
+
+    // Upload new files to Cloudinary
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        try {
+          const result = await uploadOnCloudinary(file.path);
+          if (result) {
+            mediaUrls.push(result.secure_url); // Add new media URL
+          } else {
+            console.error("Error uploading file to Cloudinary:", file.path);
+          }
+        } catch (error) {
+          console.error("Error uploading to Cloudinary:", error);
+        }
+      }
+    }
+
+    // Update the post in the database
+    await Post.findByIdAndUpdate(postId, {
+      // title: req.body.title,
+      // body: req.body.body,
+      ...req.body,
+      media: mediaUrls,
       updatedAt: Date.now(),
     });
+
     res.redirect("/admin/dashboard");
-    // res.redirect(`edit-post/${req.params.id}`);
   } catch (error) {
-    console.log(error);
+    console.error("Error editing post:", error);
+    res.status(500).send("An error occurred while editing the post.");
   }
 });
-
-
-
 
 
 /**
