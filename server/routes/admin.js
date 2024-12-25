@@ -294,7 +294,6 @@ router.post(
     try {
       const { title, body } = req.body;
       const mediaUrls = [];
-      console.log(req.files);
       
       // Access files from req.files
       if (req.files && req.files.length > 0) {
@@ -380,17 +379,18 @@ router.put("/edit-post/:id", authMiddleware, upload.array("media", 10), async (r
 
     // Update the post in the database
     await Post.findByIdAndUpdate(postId, {
-      // title: req.body.title,
-      // body: req.body.body,
-      ...req.body,
+      title: req.body.title,
+      body: req.body.body,
       media: mediaUrls,
       updatedAt: Date.now(),
     });
 
-    res.redirect("/admin/dashboard");
+    // res.redirect("/admin/dashboard");
+    return res.send(message('Post updated Successfully.', '/admin/dashboard', 1))
   } catch (error) {
     console.error("Error editing post:", error);
-    res.status(500).send("An error occurred while editing the post.");
+    res.status(500).send(message('Failed to update post.', 'dashboard', 1))
+
   }
 });
 
