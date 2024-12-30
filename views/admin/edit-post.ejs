@@ -1,3 +1,4 @@
+
 <style>
   /* From Uiverse.io by vinodjangid07 */ 
   *{
@@ -173,29 +174,19 @@
 </form>
 
 <script>
-  function deleteMedia(postId, mediaUrl) {
-    fetch(`/admin/delete-media/${postId}`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ mediaUrl }),
-    })
-      .then((response) => {
-        if (response.ok) {
-          // Remove the media element from the DOM
-          const mediaElement = document.querySelector(`[data-media-url="${mediaUrl}"]`);
-          if (mediaElement) {
-            mediaElement.remove();
-          }
-          alert('Media deleted successfully!');
-        } else {
-          alert('Failed to delete media.');
-        }
-      })
-      .catch((error) => {
-        console.error('Error deleting media:', error);
-        alert('An error occurred while deleting media.');
-      });
+  const Post = require('../../server/models/post')
+  async function deleteMedia(postId, mediaUrl) {
+    
+    const post = await Post.findById(postId) || "empty";
+    if (!post) {
+      
+      return ('empty post')
+    }
+    alert(`${post}`);
+    console.log(post);
+    alert(`postId : ${postId} and typeof : ${typeof postId}`);
+    alert(`mediaUrl : ${mediaUrl} and typeof : ${typeof mediaUrl}`);
+    
+    
   }
 </script>
